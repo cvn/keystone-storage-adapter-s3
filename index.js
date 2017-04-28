@@ -8,6 +8,7 @@ TODO
 var assign = require('object-assign');
 var debug = require('debug')('keystone-s3');
 var ensureCallback = require('keystone-storage-namefunctions/ensureCallback');
+var fs = require('fs');
 var knox = require('knox');
 var nameFunctions = require('keystone-storage-namefunctions');
 var pathlib = require('path');
@@ -137,6 +138,15 @@ S3Adapter.prototype.uploadFile = function (file, callback) {
 			// easily - just move it all, reconfigure and restart your server.
 			file.path = self.options.path;
 			file.bucket = self.options.bucket;
+
+			// Delete local temp file
+			fs.unlink(localpath, function (err) {
+				if (err) {
+					console.warn('Error deleting temp file', err);
+				} else {
+					debug('Temp file deleted');
+				}
+			});
 
 			debug('file upload successful');
 			callback(null, file);
